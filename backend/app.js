@@ -6,30 +6,29 @@ require('dotenv').config();
 const app = express();
 connectDB();
 
-// // CORS setup
-// const allowedOrigins = [
-//   'http://localhost:5173'        // Vite dev server
-//   //'https://your-frontend.vercel.app' // Deployed frontend domain
-// ];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://your-frontend-domain.vercel.app' // Replace with your actual frontend domain
+];
 
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     if (!origin || allowedOrigins.includes(origin)) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('CORS not allowed from this origin'));
-//     }
-//   },
-//   credentials: true,
-// }));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 
-app.use(
-  cors({
-    origin: ["http://localhost:5173/"],
-    methods: ["POST", "GET", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: ["http://localhost:5173/"],
+//     methods: ["POST", "GET", "PUT", "DELETE"],
+//     credentials: true,
+//   })
+// );
 
 app.get("/", (req, res) => {
   res.send("Hello from Express");
