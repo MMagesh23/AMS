@@ -11,6 +11,7 @@ const allowedOrigins = [
   'https://your-frontend-domain.vercel.app' // Replace with your actual frontend domain
 ];
 
+app.use(cors());
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
