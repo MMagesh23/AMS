@@ -6,7 +6,23 @@ require('dotenv').config();
 const app = express();
 connectDB();
 
-app.use(cors());
+// CORS setup
+const allowedOrigins = [
+  'http://localhost:5173'        // Vite dev server
+  //'https://your-frontend.vercel.app' // Deployed frontend domain
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed from this origin'));
+    }
+  },
+  credentials: true,
+}));
+
 app.use(express.json());
 
 // Routes
