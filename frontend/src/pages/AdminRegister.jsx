@@ -10,7 +10,7 @@ const AdminRegister = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await api.post('https://vbs-ams.vercel.app/api/auth/admin-register', form);
+      const res = await api.post('/auth/admin-register', form);
       toast.success("Registration successfully");
     } catch (err) {
       toast.error("Registration failed");
