@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 //app.use(cors());
 const allowedOrigins = [
     "http://localhost:5173", // your frontend during development
-    "https://your-frontend-domain.vercel.app", // production domain
+    "https://poj-vbs.vercel.app", // production domain
   ];
   
   app.use(
