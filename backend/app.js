@@ -5,10 +5,12 @@ const connectDB = require('./config/db');
 require('dotenv').config();
 
 const app = express();
+app.use(express.json());
 connectDB();
 
-
-
+app.get("/", (req, res) => {
+  res.send("Hello from Express");
+});
 
 //app.use(cors());
 const allowedOrigins = [
@@ -29,11 +31,8 @@ const allowedOrigins = [
     })
   );
 
-app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Hello from Express");
-});
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
