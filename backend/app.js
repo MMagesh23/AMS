@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const router = express.Router();
 const connectDB = require('./config/db');
 require('dotenv').config();
 
@@ -30,6 +31,9 @@ const allowedOrigins = [
 
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Hello from Express");
+});
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
