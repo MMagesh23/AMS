@@ -4,8 +4,7 @@ const jwt = require('jsonwebtoken');
 
 // Hidden Admin Register Route
 exports.registerAdmin = async (req, res) => {
-  const { userID, password, confirmPassword } = req.body;
-  if (password !== confirmPassword) return res.status(400).json({ message: "Passwords don't match" });
+  const { userID, password } = req.body;
 
   const existingUser = await User.findOne({ userID });
   if (existingUser) return res.status(400).json({ message: "Admin already exists" });
