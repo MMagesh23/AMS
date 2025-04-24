@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import api from '../utils/api';
 import { toast, ToastContainer } from "react-toastify";
 
 const AdminRegister = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ userID: '', password: '', confirmPassword: '' });
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
@@ -12,6 +14,7 @@ const AdminRegister = () => {
     try {
       const res = await api.post('/auth/admin-register', form);
       toast.success("Registration successfully");
+      navigate('/admin-login');
     } catch (err) {
       toast.error("Registration failed");
     }
