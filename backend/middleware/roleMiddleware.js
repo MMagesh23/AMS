@@ -1,9 +1,10 @@
-const roleMiddleware = (role) => (req, res, next) => {
-    if (req.user.role !== role) {
-      return res.status(403).json({ message: 'Forbidden' });
+const roleMiddleware = (roles = []) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: 'Access Forbidden: Insufficient permissions' });
     }
     next();
   };
-  
-  module.exports = roleMiddleware;
-  
+};
+
+module.exports = roleMiddleware;
