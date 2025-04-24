@@ -37,11 +37,24 @@ router.delete('/classes/:id', adminController.deleteClass);
 
 
 // --- Attendance & Dashboard ---
-router.get('/attendance/:studentId', adminController.getStudentAttendance);
-router.post('/attendance/modify', adminController.modifyAttendance);
+// View attendance of a class by date
+router.get('/class/:classId/date/:date', adminController.getClassAttendanceByDate);
+
+// Add or update missed attendance
+router.post('/add', adminController.addAttendance);
+
+// Edit specific attendance
+router.put('/update', adminController.updateAttendance);
+
+// Get summary of attendance by date
+router.get('/summary/:date', adminController.getDailySummary);
+
+router.get('/attendance/overview', adminController.getAttendanceOverview);
+
+router.get('/attendance/class/:classId/date/:date', adminController.getClassAttendanceByDate);
 
 router.get('/dashboard', adminController.getDashboardOverview);
-router.get('/dashboard/class/:classId', adminController.getClassDetail);
+// router.get('/dashboard/class/:classId', adminController.getClassDetail);
 
 
 
