@@ -31,8 +31,8 @@ exports.getStudentById = async (req, res) => {
 // Add Student
 exports.addStudent = async (req, res) => {
   try {
-    const { name, grade, place, parent, phone } = req.body;
-    const student = new Student({ name, grade, place, parent, phone });
+    const { name, grade, place, parent, phone, category	 } = req.body;
+    const student = new Student({ name, grade, place, parent, phone ,category	});
     await student.save();
     res.status(201).json({ message: 'Student added successfully', student });
   } catch (error) {
@@ -111,7 +111,7 @@ exports.addTeacher = async (req, res) => {
 exports.editTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, userID, password } = req.body;
+    const { name, userid, password } = req.body;
 
     // Find the teacher and associated user
     const teacher = await Teacher.findById(id).populate('user');
@@ -119,17 +119,19 @@ exports.editTeacher = async (req, res) => {
 
     // Update fields
     if (name) teacher.name = name;
-    if (userID) teacher.user.userID = userID;
+    if (userid) teacher.user.userID = userid; // Update userID
     if (password) {
-      const hashedPassword = await sbcrypt.hash(password, 10);
-      teacher.user.password = hashedPassword;
+      const hashedPassword = await bcrypt.hash(password, 10); // Hash the new password
+      teacher.user.password = hashedPassword; // Update password
     }
 
     // Save the updated user and teacher
     await teacher.user.save();
     await teacher.save();
 
-    res.json({ message: 'Teacher updated successfully', teacher });
+    // Return updated teacher with user details
+    const updatedTeacher = await Teacher.findById(id).populate('user');
+    res.json({ message: 'Teacher updated successfully', teacher: updatedTeacher });
   } catch (error) {
     res.status(500).json({ message: 'Error updating teacher', error });
   }
@@ -158,10 +160,10 @@ const Class = require('../models/Class');
 // Get All Classes
 exports.getAllClasses = async (req, res) => {
   try {
-    const classes = await Class.find(); // Assuming Class is your Mongoose model
+    const classes = await Class.find().populate('teacher', 'name'); // Populate teacher's name
     res.json({ classes });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch classes' });
+    res.status(500).json({ message: 'Failed to fetch classes', error: err.message });
   }
 };
 
@@ -198,18 +200,13 @@ exports.assignTeacher = async (req, res) => {
   const { teacherId, classId } = req.body;
 
   try {
-    // 1. Find teacher and class
     const teacher = await Teacher.findById(teacherId);
-    if (!teacher) {
-      return res.status(404).json({ message: 'Teacher not found' });
-    }
+    if (!teacher) return res.status(404).json({ message: 'Teacher not found' });
 
     const classData = await Class.findById(classId);
-    if (!classData) {
-      return res.status(404).json({ message: 'Class not found' });
-    }
+    if (!classData) return res.status(404).json({ message: 'Class not found' });
 
-    // 2. If teacher is already assigned to a different class, unassign them
+    // Handle reassignment logic
     if (teacher.classAssigned && teacher.classAssigned.toString() !== classId) {
       const previousClass = await Class.findById(teacher.classAssigned);
       if (previousClass) {
@@ -218,7 +215,6 @@ exports.assignTeacher = async (req, res) => {
       }
     }
 
-    // 3. If class already has a different teacher, unassign that teacher
     if (classData.teacher && classData.teacher.toString() !== teacherId) {
       const previousTeacher = await Teacher.findById(classData.teacher);
       if (previousTeacher) {
@@ -227,18 +223,17 @@ exports.assignTeacher = async (req, res) => {
       }
     }
 
-    // 4. Assign class to teacher and teacher to class
     teacher.classAssigned = classId;
     classData.teacher = teacherId;
 
     await teacher.save();
     await classData.save();
 
-    return res.status(200).json({ message: 'Teacher successfully assigned to class (with reassignments handled)' });
-
+    const updatedClass = await Class.findById(classId).populate('teacher', 'name'); // Populate teacher's name
+    res.status(200).json({ message: 'Teacher successfully assigned', class: updatedClass });
   } catch (error) {
     console.error('Error assigning teacher:', error);
-    return res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -250,6 +245,8 @@ exports.allocateStudents = async (req, res) => {
     const { id: classId } = req.params;
 
     const classData = await Class.findById(classId);
+    console.log('Class category:', classData.category, typeof classData.category);
+
     if (!classData) return res.status(404).json({ message: 'Class not found' });
 
     let addedCount = 0;
@@ -257,6 +254,7 @@ exports.allocateStudents = async (req, res) => {
 
     for (const studentId of studentIds) {
       const student = await Student.findById(studentId);
+      console.log('Student grade:', student?.grade, typeof student?.grade);
 
       if (!student) {
         skipped.push({ studentId, reason: 'Student not found' });
@@ -264,10 +262,12 @@ exports.allocateStudents = async (req, res) => {
       }
 
       // Skip if category mismatch
-      if (student.grade !== classData.category) {
+      // Skip if category mismatch
+      if (student.category !== classData.category) {
         skipped.push({ studentId, name: student.name, reason: 'Category mismatch' });
         continue;
       }
+
 
       // Skip if already assigned to this class
       if (student.classAssigned?.toString() === classId) {
@@ -366,34 +366,208 @@ exports.deleteClass = async (req, res) => {
 
 const Attendance = require('../models/Attendance');
 
-// Get Attendance by Student
-exports.getStudentAttendance = async (req, res) => {
+// 📌 View attendance for a class on a specific day
+exports.getClassAttendanceByDate = async (req, res) => {
+  const { classId, date } = req.params;
   try {
-    const { studentId } = req.params;
-    const attendance = await Attendance.find({ student: studentId }).populate('student');
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const attendance = await Attendance.find({
+      classId,
+      date: { $gte: start, $lte: end },
+    }).populate('student');
+
     res.json(attendance);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching attendance', error });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// Modify a Student’s Attendance (by Admin)
-exports.modifyAttendance = async (req, res) => {
+// 📌 Add missed attendance for a date
+exports.addAttendance = async (req, res) => {
   try {
-    const { attendanceId, status } = req.body;
-    const attendance = await Attendance.findById(attendanceId);
-    if (!attendance) return res.status(404).json({ message: "Attendance record not found" });
+    const { classId, date, records } = req.body;
+    if (!classId || !date || !Array.isArray(records)) {
+      return res.status(400).json({ message: 'Missing or invalid fields' });
+    }
 
-    attendance.status = status;
-    await attendance.save();
+    const attendanceDate = new Date(date);
+    const today = new Date();
+    if (attendanceDate > today) {
+      return res.status(400).json({ message: 'Cannot add attendance for a future date' });
+    }
 
-    res.json({ message: "Attendance updated", attendance });
-  } catch (error) {
-    res.status(500).json({ message: 'Error modifying attendance', error });
+    const inserted = await Promise.all(
+      records.map(async ({ studentId, status }) => {
+        return await Attendance.findOneAndUpdate(
+          { student: studentId, date: attendanceDate },
+          {
+            student: studentId,
+            classId,
+            date: attendanceDate,
+            status,
+          },
+          { upsert: true, new: true }
+        );
+      })
+    );
+
+    res.status(200).json({ message: 'Attendance added/updated', count: inserted.length });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// Dashboard → Categories → Classes
+// 📌 Update a specific attendance record
+// Update attendance status (toggle)
+exports.updateAttendance = async (req, res) => {
+  try {
+    const { attendanceId, newStatus, studentId, classId, date } = req.body;
+    let updated;
+
+    if (attendanceId) {
+      updated = await Attendance.findByIdAndUpdate(attendanceId, { status: newStatus }, { new: true });
+    } else {
+      // Create new record if not exists
+      updated = await Attendance.create({
+        student: studentId,
+        classId,
+        date: new Date(date),
+        status: newStatus
+      });
+    }
+
+    res.json({ message: 'Status updated', updated });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+
+// 📌 Daily summary across all classes
+exports.getDailySummary = async (req, res) => {
+  const { date } = req.params;
+  try {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const classes = await Class.find({});
+    const summary = [];
+
+    for (let cls of classes) {
+      const students = await Student.find({ classAssigned: cls._id });
+      const attendance = await Attendance.find({
+        classId: cls._id,
+        date: { $gte: start, $lte: end },
+      });
+
+      summary.push({
+        classId: cls._id,
+        className: cls.name,
+        total: students.length,
+        present: attendance.filter((a) => a.status === 'present').length,
+        absent: attendance.filter((a) => a.status === 'absent').length,
+        submitted: attendance.length > 0,
+      });
+    }
+
+    res.json(summary);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// 📌 Attendance overview for 10 days per class
+exports.getAttendanceOverview = async (req, res) => {
+  try {
+    const today = new Date();
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(today.getDate() - 9);
+
+    const classes = await Class.find().populate('students');
+    const overview = [];
+
+    for (const classObj of classes) {
+      const classData = {
+        className: classObj.name,
+        category: classObj.category,
+        totalStudents: classObj.students.length,
+        days: []
+      };
+
+      for (let i = 0; i < 10; i++) {
+        const day = new Date(today);
+        day.setDate(day.getDate() - i);
+        day.setHours(0, 0, 0, 0);
+        const nextDay = new Date(day);
+        nextDay.setHours(23, 59, 59, 999);
+
+        const presentCount = await Attendance.countDocuments({
+          classId: classObj._id,
+          date: { $gte: day, $lte: nextDay },
+          status: 'present'
+        });
+
+        classData.days.unshift({
+          date: day,
+          present: presentCount,
+          percentage: classObj.students.length
+            ? Math.round((presentCount / classObj.students.length) * 100)
+            : 0,
+        });
+      }
+
+      overview.push(classData);
+    }
+
+    res.json(overview);
+  } catch (err) {
+    console.error('Error in getAttendanceOverview:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get attendance list for a class on a specific day
+exports.getClassAttendanceByDate = async (req, res) => {
+  const { classId, date } = req.params;
+  try {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const classData = await Class.findById(classId).populate('students');
+    if (!classData) return res.status(404).json({ message: 'Class not found' });
+
+    const records = await Attendance.find({
+      classId,
+      date: { $gte: start, $lte: end },
+    });
+
+    const studentAttendance = classData.students.map((student) => {
+      const record = records.find(r => r.student.toString() === student._id.toString());
+      return {
+        studentId: student._id,
+        name: student.name,
+        status: record ? record.status : 'absent',  // default to 'absent' if no record
+        attendanceId: record ? record._id : null,
+      };
+    });
+
+    res.json({ className: classData.name, date, students: studentAttendance });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+
+
+// 📌 Dashboard Class-Categorized Overview
 exports.getDashboardOverview = async (req, res) => {
   try {
     const classes = await Class.find().populate('teacher');
@@ -420,60 +594,3 @@ exports.getDashboardOverview = async (req, res) => {
   }
 };
 
-// Dashboard → Class Detail View with Attendance for the Date Range
-exports.getClassDetail = async (req, res) => {
-  try {
-    const { classId } = req.params;
-
-    // Date range (April 28, 2025 to May 7, 2025)
-    const startDate = moment('2025-04-28');
-    const endDate = moment('2025-05-07');
-    const dateRange = [];
-
-    // Generate the date range
-    for (let m = moment(startDate); m.isBefore(endDate); m.add(1, 'days')) {
-      dateRange.push(m.format('YYYY-MM-DD'));
-    }
-
-    // Fetch the class data along with its students and teacher
-    const classData = await Class.findById(classId)
-      .populate('teacher')
-      .populate('students');
-
-    if (!classData) return res.status(404).json({ message: "Class not found" });
-
-    // Fetch attendance records for the students in the given date range
-    const attendanceData = await Attendance.find({
-      student: { $in: classData.students.map(s => s._id) },
-      date: { $in: dateRange },
-    });
-
-    // Prepare the student attendance data
-    const studentAttendance = classData.students.map(student => {
-      const records = attendanceData.filter(a => a.student.toString() === student._id.toString());
-
-      const attendanceByDate = dateRange.map(date => {
-        const record = records.find(r => r.date === date);
-        return {
-          date,
-          status: record ? record.status : null, // status can be "Present", "Absent", or null (if no record)
-          _id: record ? record._id : null, // attendanceId for modification
-        };
-      });
-
-      return {
-        studentId: student._id,
-        name: student.name,
-        attendance: attendanceByDate,
-      };
-    });
-
-    res.json({
-      className: classData.name,
-      teacher: classData.teacher ? classData.teacher.name : 'None',
-      students: studentAttendance,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching class detail', error });
-  }
-};
