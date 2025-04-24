@@ -5,6 +5,7 @@ import api from '../utils/api';
 
 const gradeToLabel = (grade) => {
   if (grade === -1) return 'LKG';
+  if (grade === 0) return 'UKG'; // Added UKG grade
   return `Grade ${grade}`;
 };
 
@@ -76,7 +77,7 @@ const StudentList = () => {
 
   filteredStudents.forEach((student) => {
     const grade = student.grade;
-    if (grade === -1 || (grade >= 1 && grade <= 2)) {
+    if (grade === -1 || grade === 0 || (grade >= 1 && grade <= 2)) {
       categorized.Beginner.push(student);
     } else if (grade >= 3 && grade <= 5) {
       categorized.Primary.push(student);
@@ -195,6 +196,7 @@ const StudentList = () => {
           >
             <option value="all">All Grades</option>
             <option value="-1">LKG</option>
+            <option value="0">UKG</option> {/* Added UKG grade */}
             {[...Array(12)].map((_, i) => (
               <option key={i + 1} value={i + 1}>
                 Grade {i + 1}
