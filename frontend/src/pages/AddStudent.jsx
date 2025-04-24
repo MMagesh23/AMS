@@ -15,6 +15,7 @@ const AddStudent = () => {
 
   const gradeOptions = [
     { label: 'LKG', value: -1 },
+    { label: 'UKG', value: 0 }, // Added UKG grade
     { label: '1', value: 1 },
     { label: '2', value: 2 },
     { label: '3', value: 3 },
@@ -30,7 +31,7 @@ const AddStudent = () => {
   ];
 
   const getCategory = (grade) => {
-    if (grade >= -1 && grade <= 2) return 'Beginner';
+    if (grade >= -1 && grade <= 2) return 'Beginner'; // Includes LKG (-1), UKG (0), and Grade 1–2
     if (grade >= 3 && grade <= 5) return 'Primary';
     if (grade >= 6 && grade <= 8) return 'Junior';
     if (grade >= 9 && grade <= 12) return 'Inter';
