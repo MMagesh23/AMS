@@ -8,9 +8,11 @@ const teacherController = require('../controllers/teacherController');
 router.use(auth); 
 router.use(checkRole('teacher'));
 
+router.get('/time-window', teacherController.getTimeWindow);
+
 // ✅ Routes
 router.get('/assigned-class', teacherController.getAssignedClass);
-router.get('/check-today', teacherController.checkTodayAttendance);
+router.get('/check-attendance-status', teacherController.checkAttendanceStatus);
 router.post('/submit-attendance', teacherController.submitAttendance);
 router.get('/past-attendance', teacherController.getPastAttendance);
 
