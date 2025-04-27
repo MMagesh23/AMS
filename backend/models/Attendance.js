@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const attendanceSchema = new mongoose.Schema({
   date: { type: Date, required: true },
+  day: { type: Number}, // Map real dates to Day 1–10
   student: { type: mongoose.Schema.Types.ObjectId, ref: 'Student' },
   status: { type: String, enum: ['present', 'absent'], required: true },
   submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Teacher' },
