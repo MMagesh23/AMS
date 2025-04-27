@@ -105,7 +105,7 @@ const AttendanceManagement = () => {
   };
 
   const navigateToTimeWindow = () => {
-    navigate("/admin-login");
+    navigate("/admin/time-window");
   };
 
   return (
