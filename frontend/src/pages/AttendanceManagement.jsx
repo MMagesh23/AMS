@@ -4,8 +4,11 @@ import { Loader2, Settings } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import AdminLayout from "../layouts/AdminLayout";
+import { useNavigate } from "react-router-dom";
+
 
 const AttendanceManagement = () => {
+  const navigate = useNavigate();
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState(null);
   const [attendanceRecords, setAttendanceRecords] = useState([]);
@@ -102,8 +105,7 @@ const AttendanceManagement = () => {
   };
 
   const navigateToTimeWindow = () => {
-    // Navigate to the page where the time window can be set
-    window.location.href = "/admin/time-window"; // Adjust the URL to match your routing setup
+    navigate("/admin-login");
   };
 
   return (
