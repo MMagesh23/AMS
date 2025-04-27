@@ -19,7 +19,7 @@ const AddVolunteer = () => {
       setName('');
       setPhone('');
       setTimeout(() => {
-        navigate('/admin/students'); // Redirect after successful creation
+        navigate('/admin/volunteers'); // Redirect after successful creation
       }, 2000);
     } catch (error) {
       setErrorMessage('Error adding volunteer');
