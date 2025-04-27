@@ -259,12 +259,7 @@ const AttendanceManagement = () => {
                         >
                           Mark as {record.status === "present" ? "Absent" : "Present"}
                         </button>
-                        <button
-                            onClick={() => deleteAttendance(record.attendanceId)}
-                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-200"
-                          >
-                            Delete
-                        </button>
+                        
                       </td>
                     </tr>
                   ))}
