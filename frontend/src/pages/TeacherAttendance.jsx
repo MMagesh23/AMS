@@ -131,15 +131,30 @@ const TeacherAttendance = () => {
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="present">Present</option>
-                <option value="absent">Absent</option>
-              </select>
+              <div className="flex items-center space-x-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="present"
+                    checked={status === "present"}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-gray-700">Present</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="status"
+                    value="absent"
+                    checked={status === "absent"}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-gray-700">Absent</span>
+                </label>
+              </div>
             </div>
 
             <button
