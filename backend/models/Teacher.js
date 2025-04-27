@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const teacherSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: String,
+  phone: { type: String, required: true }, // Added phone field
   classAssigned: { type: mongoose.Schema.Types.ObjectId, ref: 'Class' }
 });
 
