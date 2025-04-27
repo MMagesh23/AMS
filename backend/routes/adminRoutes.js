@@ -15,6 +15,14 @@ router.post('/students', adminController.addStudent);
 router.put('/students/:id', adminController.editStudent);
 router.delete('/students/:id', adminController.deleteStudent);
 
+// Mark attendance for a teacher
+router.post('/teachers/attendance', adminController.markTeacherAttendance);
+// Get all teacher attendance records
+router.get('/teachers/attendance', adminController.getTeacherAttendance);
+// Delete a specific teacher attendance record
+router.delete("/teachers/attendance/:id", adminController.deleteTeacherAttendance);
+
+
 // --- Teacher Routes ---
 console.log(adminController.getAllTeachers); // Should log the function definition
 router.get('/teachers', adminController.getAllTeachers);
@@ -41,7 +49,7 @@ router.delete('/classes/:id', adminController.deleteClass);
 router.get('/class/:classId/date/:date', adminController.getClassAttendanceByDate);
 
 // Add or update missed attendance
-router.post('/add', adminController.addAttendance);
+// router.post('/add', adminController.addAttendance);
 
 // Edit specific attendance
 router.put('/update', adminController.updateAttendance);
@@ -50,12 +58,32 @@ router.put('/update', adminController.updateAttendance);
 router.get('/summary/:date', adminController.getDailySummary);
 
 router.get('/attendance/overview', adminController.getAttendanceOverview);
-
+router.post('/attendance/add-or-update', adminController.addOrUpdateAttendance);
 router.get('/attendance/class/:classId/date/:date', adminController.getClassAttendanceByDate);
-
+router.delete("/attendance/:id", adminController.deleteAttendance);
+//
 router.get('/dashboard', adminController.getDashboardOverview);
 // router.get('/dashboard/class/:classId', adminController.getClassDetail);
 
+// Volunteer attendance routes
+router.get('/volunteers/attendance', adminController.getVolunteerAttendance);
+router.post('/volunteers/attendance', adminController.markVolunteerAttendance);
+router.put('/volunteers/attendance/:id', adminController.editVolunteerAttendance);
+router.delete('/volunteers/attendance/:id', adminController.deleteVolunteerAttendance);
+
+// Volunteer CRUD routes
+router.post('/volunteers', adminController.addVolunteer);
+router.get('/volunteers', adminController.getVolunteers);
+router.get('/volunteers/:id', adminController.getVolunteerById);
+router.put('/volunteers/:id', adminController.editVolunteer);
+router.delete('/volunteers/:id', adminController.deleteVolunteer);
+
+router.get("/dashboard/analytics", adminController.getDashboardAnalytics);
+
+// Set time window
+router.post('/time-window', adminController.setTimeWindow); 
+// Get time window
+router.get('/time-window', adminController.getTimeWindow); 
 
 
 module.exports = router;
