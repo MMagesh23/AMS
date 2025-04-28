@@ -66,9 +66,6 @@ const AddStudent = () => {
       setPlace('');
       setParent('');
       setPhone('');
-      setTimeout(() => {
-        navigate('/admin/students'); // Redirect after successful creation
-      }, 2000);
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Error creating student');
       setSuccessMessage('');
