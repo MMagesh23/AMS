@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import AdminLayout from "../layouts/AdminLayout";
 
 const AddStudent = () => {
   const [name, setName] = useState('');
@@ -75,6 +76,7 @@ const AddStudent = () => {
   };
 
   return (
+    <AdminLayout>
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
         <h2 className="text-2xl font-semibold mb-4">Add New Student</h2>
@@ -195,6 +197,7 @@ const AddStudent = () => {
         </form>
       </div>
     </div>
+    </AdminLayout>
   );
 };
 
