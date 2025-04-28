@@ -52,7 +52,6 @@ const EditVolunteer = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               />
             </div>
@@ -62,7 +61,6 @@ const EditVolunteer = () => {
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               />
             </div>
