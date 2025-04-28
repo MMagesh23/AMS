@@ -121,7 +121,6 @@ const EditStudent = () => {
               name="name"
               value={studentData.name}
               onChange={handleChange}
-              required
               className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -135,7 +134,6 @@ const EditStudent = () => {
               name="grade"
               value={studentData.grade}
               onChange={handleChange}
-              required
               className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="" disabled>
@@ -159,7 +157,6 @@ const EditStudent = () => {
               name="place"
               value={studentData.place}
               onChange={handleChange}
-              required
               className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -174,7 +171,6 @@ const EditStudent = () => {
               name="parent"
               value={studentData.parent}
               onChange={handleChange}
-              required
               className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -189,7 +185,6 @@ const EditStudent = () => {
               name="phone"
               value={studentData.phone}
               onChange={handleChange}
-              required
               className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
