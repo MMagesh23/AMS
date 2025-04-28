@@ -90,7 +90,6 @@ const EditTeacher = () => {
                 name="name"
                 value={teacherData.name}
                 onChange={handleChange}
-                required
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -105,7 +104,6 @@ const EditTeacher = () => {
                 name="phone"
                 value={teacherData.phone}
                 onChange={handleChange}
-                required
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -120,7 +118,6 @@ const EditTeacher = () => {
                 name="userid"
                 value={teacherData.userid}
                 onChange={handleChange}
-                required
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -135,7 +132,6 @@ const EditTeacher = () => {
                 name="password"
                 value={teacherData.password}
                 onChange={handleChange}
-                required
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
