@@ -8,6 +8,7 @@ import AdminLayout from "../layouts/AdminLayout";
 
 const gradeToLabel = (grade) => {
   if (grade === -1) return 'LKG';
+  if (grade === 0) return 'UKG';
   return `Grade ${grade}`;
 };
 
