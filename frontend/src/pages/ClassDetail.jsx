@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { jsPDF } from "jspdf"; // Import jsPDF
 import api from "../utils/api";
 import { motion } from 'framer-motion';
 import { useParams } from 'react-router-dom';
@@ -78,6 +79,43 @@ const ClassDetail = () => {
     }
   };
 
+  // Function to export class details and student list to PDF
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Add class details
+    doc.setFontSize(16);
+    doc.text(`${classData.name} (${classData.category})`, 10, 10);
+    doc.setFontSize(12);
+    doc.text(`Teacher: ${classData.teacher?.name || 'Unassigned'}`, 10, 20);
+
+    // Add table header
+    doc.setFontSize(14);
+    doc.text("Student List", 10, 30);
+    doc.setFontSize(10);
+    doc.text("S.No", 10, 40);
+    doc.text("Name", 30, 40);
+    doc.text("STD", 80, 40);
+    doc.text("Place", 110, 40);
+    doc.text("Parent", 140, 40);
+    doc.text("Phone", 180, 40);
+
+    // Add student data
+    let y = 50;
+    students.forEach((student, index) => {
+      doc.text(`${index + 1}`, 10, y);
+      doc.text(student.name, 30, y);
+      doc.text(gradeToLabel(student.grade), 80, y);
+      doc.text(student.place, 110, y);
+      doc.text(student.parent, 140, y);
+      doc.text(student.phone, 180, y);
+      y += 10;
+    });
+
+    // Save the PDF
+    doc.save(`${classData.name}_Student_List.pdf`);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -104,12 +142,20 @@ const ClassDetail = () => {
 
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold text-gray-800">Students</h2>
-          <button
-            className="bg-gradient-to-r from-green-500 to-green-700 text-white px-4 py-2 rounded-lg shadow hover:from-green-600 hover:to-green-800 transition"
-            onClick={() => setShowModal(true)}
-          >
-            Add Students
-          </button>
+          <div className="flex gap-4">
+            <button
+              className="bg-gradient-to-r from-green-500 to-green-700 text-white px-4 py-2 rounded-lg shadow hover:from-green-600 hover:to-green-800 transition"
+              onClick={() => setShowModal(true)}
+            >
+              Add Students
+            </button>
+            <button
+              className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2 rounded-lg shadow hover:from-blue-600 hover:to-blue-800 transition"
+              onClick={exportToPDF}
+            >
+              Export to PDF
+            </button>
+          </div>
         </div>
 
         {students.length === 0 ? (
