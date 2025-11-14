@@ -1,4 +1,4 @@
-# AMS (Attendance Management System)
+# VBS-MS (VBS - Management System)
 
 A full-stack attendance management system built with Express.js (backend) and React (frontend) for managing students, teachers, volunteers, classes, and attendance tracking.
 
